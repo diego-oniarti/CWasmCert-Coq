@@ -1,0 +1,202 @@
+\documentclass{article}
+
+% a bunch of useful packages.
+\usepackage[inference]{semantic}
+\usepackage{amsmath} \allowdisplaybreaks % lets align equations break over pages.
+\usepackage{hyperref}
+\usepackage[amsmath,hyperref,amsthm]{ntheorem}
+\usepackage{thmtools}
+\usepackage[capitalize]{cleveref}
+\usepackage{mathpartir}
+\usepackage{stmaryrd}
+\usepackage{amssymb}
+\usepackage{latexsym}
+\usepackage{color}
+\usepackage[dvipsnames]{xcolor} % the best way to colour text
+\usepackage[colorinlistoftodos]{todonotes} 
+\usepackage{tikz} \usetikzlibrary{positioning,shadows,arrows,calc,backgrounds,fit,shapes,shapes.multipart,decorations.pathreplacing,shapes.misc,patterns}
+\usepackage{xspace}
+\usepackage{scalerel}
+%\usepackage{bm} %bold math. a mess to use.
+\usepackage{bussproofs} % for logic-style proofs
+% \usepackage{geometry}\geometry{margin=2cm}
+
+\hypersetup{ pdfpagemode=UseOutlines, colorlinks=true, linkcolor=red, citecolor=blue }
+
+% organise your code.
+\input{cmds}
+
+% \newcommand{\box}[1]{\colorbox{green!20}{#1}}
+% Elements of standard Wasm
+\newcommand{\ws}[1]{\mathtt{#1}}
+% Elements introduced by CWasm
+\newcommand{\new}[1]{\mathtt{\color{magenta}{#1}}}
+
+% Things I either still need to define or find a better symbol for
+\newcommand{\addrt}{u32}        % Address type
+\newcommand{\colt}{\mathbb{N}}  % Color type
+
+\newcommand{\numt}{\tau_n}      % Numeric type
+\newcommand{\tagt}{\tau_{tag}}  % Tag type
+\newcommand{\ptrt}{\tau_{ptr}}  % Pointer type
+
+\newcommand{\te}[1]{\text{#1}}
+
+\title{
+    CWasm\\
+    \large{(Diego's version)}
+}
+\author{Diego Oniarti}
+\date{}
+
+\begin{document}
+\maketitle
+
+\section{Values}
+A new value is introduced that is the colored pointer (here referred to just pointer
+for brevity). Pointers are kin to CHERI capabilities and have three components:
+\begin{enumerate}
+    \item addr: An address in memory
+    \item color: Pointers are used to access the new ``colored memory". The color
+        of a pointer must match the color of the memory region it tries to
+        access, lest it traps.
+    \item tag: An identifier given to the pointer upon allocation. This id is preserved
+        when the pointer is incremented and decremented.
+\end{enumerate}
+For now we assume infinite possible colors, represented by natural numbers. In later
+stages of the project I'm going to limit the number of colors.
+
+\begin{align*}
+    && \ws{byte} \bnfdef&\ \ws{0x00} \mid \dots \mid \ws{0xff}
+    \\
+    \te{(integers)} && \left\{ \begin{aligned}
+            \ws{uN} \bnfdef& \\
+            \ws{sN} \bnfdef& \\
+            \ws{iN} \bnfdef&
+    \end{aligned} \right. &\
+    \begin{aligned}
+        & 0 \mid 1 \mid \dots \mid 2^N-1 \\
+        & -2^{N-1} \mid \dots \mid -1 \mid 0 \mid 1 \mid \dots \mid 2^{N-1}-1 \\
+        & \ws{uN}
+    \end{aligned}
+    \\
+    && \ws{name} \bnfdef&\ \ws{char}^*
+    \\
+    && \ws{char} \bnfdef&\ \ws{U+00} \mid \dots \mid \ws{U+D7FF} \mid \ws{U+E000} \mid \dots \mid \ws{U+10FFFF}
+    \\
+    \te{(pointer)}&& \new{p} \bnfdef&\ \new{ \{addr: \addrt,\ color: \colt,\ id: \mathbb N\} }
+    \\
+    \te{(value)} && \ws{v} \bnfdef&\ \ws{\numt.const\ c} \mid \new{\ptrt.const\ p}
+    \\
+                 &&& \dots \te{floats and others unchanged} \dots
+\end{align*}
+
+\section{Types}
+A new type for pointers has been introduced ($\ptrt$), while the old numeric type get
+relegated to the ``numeric type" $\numt$. The more generic $\tau$ takes both
+classes of types.
+
+\begin{align*}
+    \te{(numeric)}
+    &&\new{\numt} \bnfdef&\
+    \ws{i32} \mid \ws{i64} \mid \ws{f32} \mid \ws{f64}
+    \\
+    \te{(value type)}
+    && \new{\tau} \bnfdef&\
+    \new{\numt} \mid \new{\ptrt}
+    \\
+    \te{(function/instructions)}
+    &&\ws{\rho} \bnfdef&\
+    \ws{\tau^* \to \tau^*}
+    \\
+    &&& \dots rest \dots
+\end{align*}
+
+\section{Runtime instances}
+The ``colored memory" is introduced as an alternative to the standard heap. Bytes
+in colored memory are ``tagged" with a color and a tag. The color is set to an area
+of memory when it is allocated, and it is used to ensure spatial safety. The tag
+distinguishes between numeric values and handles. New instructions are used to load
+and store handles to memory, and a load will trap if the memory is not tag as
+containing a pointer.
+
+\begin{align*}
+    \te{(heap)} && \ws{H} \bnfdef&\ \ws{\{data: byte^*,\ max: u32^?\}}
+    \\
+    \te{(tagged byte)} && \new{tbyte} \bnfdef&\ \new{byte \times \colt \times \tagt}
+    \\
+    \textstyle \left( \begin{matrix} \text{colored memory} \\ \text{instance}\end{matrix} \right) && \new{\Xi} \bnfdef&\ \new{\{ data: tbyte^*,\ max : u32^?\}}
+    \\
+    \te{(allocator instance)} && \new{A} \bnfdef&\ \new{to\ be\ determined}
+    \\
+    \te{(num/ptr)}
+    && \new{\tagt} \bnfdef&\
+    \new{\circ} \mid \new{\square}
+    \\
+    \te{(store)} && & ...
+\end{align*}
+The store gets extended with an instance of the colored memory and an instance of
+the allocator
+
+
+\section{Instructions}
+Instructions defined with reference to both \href{https://www.w3.org/2021/11/wasm-stage/syntax/instructions.html}{Wasm} and the Iris-MSWasm paper.
+
+\subsection{Numeric instructions}
+Numeric instructions are modified to only work on numeric types ($\numt$) instead
+of all types ($\tau$).
+
+\subsection{Parametric}
+Parametric instructions are unchanged.
+
+\subsection{Variable instructions}
+Variable instructions are also unchanged. Pointers can be set and gotten like any
+other value.
+
+\subsection{Administrative instructions}
+The modifications to the administrative instructions are the same as in the
+iris-MSWasm paper.
+\begin{align*}
+    \ws{ai} \bnfdef&\ \ws{bi} \mid \new{\ptrt.const\ p} \mid \ws{trap} \mid \ws{invoke\ i} \mid \dots
+\end{align*}
+
+\subsection{Memory instructions}
+The existing memory instructions work as usual for the types already existing in
+Wasm. $\ptrt.load$ will trap to avoid forgery. $\ptrt.store$ could still be allowed.
+
+\begin{align*}
+    \te{(basic instructions)} && \ws{bi} \bnfdef&\ \dots \mid
+    \new{colalloc} \mid
+    \new{colfree} \mid
+    \new{\ptrt.add} \\ &&&
+    \mid \new{\tau.colstore} \mid
+    \new{\tau.colload}
+\end{align*}
+
+\begin{itemize}
+    \item $\new{colalloc}$: pops an int $n$ from the stack and allocate $n$ bytes
+        of memory in the colored memory $\Xi$. The allocated bytes need to be zeroed
+        and colored with a fresh color. The instruction puts a pointer $\new{p}$ on
+        the stack. The pointer has a fresh id and the same color as the memory.
+    \item $\new{colfree}$: pops a $\new{\ptrt}$ from the stack. The id of the pointer
+        is invalidated by the allocator, which will make all subsequent uses of it
+        trap.
+        \footnote{The instructions as described here do not take into consideration
+            the allocator strategy. New allocations should be able to overwrite freed
+        areas of memory}
+    \item $\new{\ptrt.add}$: pops a $p: \new{\ptrt}$ and a $n: \ws{i32/i64}$ from the
+        stack. Adds $n$ to the address component of $p$. Incrementing (or
+        decrementing) a pointer address outside of its allocated area does not cause
+        a trap. Only utilizing the pointer (load/store) will trap.
+    \item $\new{\tau.colstore}$: pops a pointer and a value from the stack. Interprets
+        the value as $\tau$ and writes its byte representation to the colored memory.\\
+        If $\tau$ is $\ptrt$, the value must be a $\new{\ptrt.const\ p}$. If $\tau$
+        is $\numt$, the value must be $\ws{\numt}$.\\
+        All bytes being accessed in memory must have the same color as the pointer.
+        The appropriate tag will be set the altered bytes, depending on $\tau$.
+    \item $\new{\tau.colload}$: Pops a pointer from the stack, loads the value in
+        colored memory that pointer points to, and pushes the value onto the stack.
+        If $\tau$ is $\ptrt$ all bytes read from memory need to have the $\square$ tag.
+\end{itemize}
+
+\end{document}
