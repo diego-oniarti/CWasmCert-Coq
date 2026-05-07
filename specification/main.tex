@@ -40,6 +40,9 @@
 \newcommand{\tagt}{\tau_{tag}}  % Tag type
 \newcommand{\ptrt}{\tau_{ptr}}  % Pointer type
 
+\newcommand{\tagnum}{\bigcirc}
+\newcommand{\tagptr}{\blacksquare}
+
 \newcommand{\te}[1]{\text{#1}}
 
 \title{
@@ -127,24 +130,30 @@ containing a pointer.
     \\
     \textstyle \left( \begin{matrix} \text{colored memory} \\ \text{instance}\end{matrix} \right) && \new{\Xi} \bnfdef&\ \new{\{ data: tbyte^*,\ max : u32^?\}}
     \\
-    \te{(allocator instance)} && \new{A} \bnfdef&\ \new{to\ be\ determined}
+    \te{(allocator instance)} && \new{A} \bnfdef&\ \new{id \to \colt?}
     \\
     \te{(num/ptr)}
     && \new{\tagt} \bnfdef&\
-    \new{\circ} \mid \new{\square}
+    \new{\tagnum} \mid \new{\tagptr}
     \\
-    \te{(store)} && & ...
+    \te{(store)} && \ws{S} \bnfdef&\ \ws{\{funcs, tables, mems, globals,} \\
+                 &&               & \new{colored\_mem: \Xi}, \new{allocator:A}\}
 \end{align*}
 The store gets extended with an instance of the colored memory and an instance of
-the allocator
+the allocator.
 
+The allocator is a map between all valid pointer ids and their color. When a pointer
+gets freed, the entry in the allocator with its pointer is removed.
 
 \section{Instructions}
-Instructions defined with reference to both \href{https://www.w3.org/2021/11/wasm-stage/syntax/instructions.html}{Wasm} and the Iris-MSWasm paper.
+Instructions defined with reference both to \href{https://www.w3.org/2021/11/wasm-stage/syntax/instructions.html}{Wasm} and to the Iris-MSWasm paper\cite{iriswasm}.
 
 \subsection{Numeric instructions}
 Numeric instructions are modified to only work on numeric types ($\numt$) instead
 of all types ($\tau$).
+
+Some new $relop$ instructions may be added for $\ptrt$. These would only compare the
+address of the two pointers.
 
 \subsection{Parametric}
 Parametric instructions are unchanged.
@@ -155,14 +164,15 @@ other value.
 
 \subsection{Administrative instructions}
 The modifications to the administrative instructions are the same as in the
-iris-MSWasm paper.
+iris-MSWasm paper\cite{iriswasm}.
 \begin{align*}
     \ws{ai} \bnfdef&\ \ws{bi} \mid \new{\ptrt.const\ p} \mid \ws{trap} \mid \ws{invoke\ i} \mid \dots
 \end{align*}
 
 \subsection{Memory instructions}
 The existing memory instructions work as usual for the types already existing in
-Wasm. $\ptrt.load$ will trap to avoid forgery. $\ptrt.store$ could still be allowed.
+Wasm. The $\cw{load}$ operation is not defined for the $\ptrt$ type, to avoid forgery.
+\todo{$\new{\ptrt.store}$ could still be allowed, but should it?}
 
 \begin{align*}
     \te{(basic instructions)} && \ws{bi} \bnfdef&\ \dots \mid
@@ -196,7 +206,39 @@ Wasm. $\ptrt.load$ will trap to avoid forgery. $\ptrt.store$ could still be allo
         The appropriate tag will be set the altered bytes, depending on $\tau$.
     \item $\new{\tau.colload}$: Pops a pointer from the stack, loads the value in
         colored memory that pointer points to, and pushes the value onto the stack.
-        If $\tau$ is $\ptrt$ all bytes read from memory need to have the $\square$ tag.
+        If $\tau$ is $\ptrt$ all bytes read from memory need to have the $\tagptr$ tag.
 \end{itemize}
 
+\section{Instruction typing}
+\begin{center}
+    \typerule{wt-colalloc}{}{
+        \Gamma \vdash \new{colalloc}: [i32/i64] \to [\new{\ptrt}]
+    }{colalloc}
+    \typerule{wt-colfree}{}{
+        \Gamma \vdash \new{colfree}: [\new{\ptrt}] \to []
+    }{colfree}
+
+    \typerule{wt-ptradd}{}{
+        \Gamma \vdash \new{\ptrt.add}: [\new{\ptrt}, i32/i64] \to [\new{\ptrt}]
+    }{ptradd}
+
+    \typerule{wt-colstore}{}{
+        \Gamma \vdash \new{\numt.store}: [\new{\ptrt}, \numt] \to []
+    }{colstore}
+    \typerule{wt-colstore-ptr}{}{
+        \Gamma \vdash \new{\ptrt.store}: [\new{\ptrt}, \ptrt] \to []
+    }{colstore-ptr}
+
+    \typerule{wt-load}{}{
+        \Gamma \vdash \new{\numt.load} [\new{\ptrt}, \numt] \to [\numt]
+    }{colload}
+    \typerule{wt-load-ptr}{}{
+        \Gamma \vdash \new{\ptrt.load} [\new{\ptrt}, \ptrt] \to [\ptrt]
+    }{colload-ptr}
+\end{center}
+
+\section{Allocator semantics}
+
+\bibliographystyle{alpha}
+\bibliography{refs}
 \end{document}
