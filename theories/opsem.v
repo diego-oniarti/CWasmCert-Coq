@@ -4,7 +4,7 @@
 
 From Coq Require Import ZArith.BinInt.
 From mathcomp Require Import ssreflect ssrfun ssrnat ssrbool eqtype seq.
-Require Export operations host.
+Require Export Wasm.operations Wasm.host.
 
 Set Implicit Arguments.
 Unset Strict Implicit.

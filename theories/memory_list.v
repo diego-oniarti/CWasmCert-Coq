@@ -171,7 +171,7 @@ lia.
 Qed.
 
 
-Require Import bytes common.
+Require Import Wasm.bytes Wasm.common.
 
 Definition memory_list_eq_dec : forall (i1 i2 : memory_list), {i1 = i2} + {i1 <> i2}.
 Proof. decidable_equality. Defined.

@@ -1,4 +1,8 @@
+(env
+  (_
+    (binaries ../src/wasm_coq_interpreter.exe)))
+
 (mdx
-  (deps 
-     (glob_files *.wasm))
-)
+  (deps
+    %{bin:wasm_coq_interpreter}
+    (glob_files *.wasm)))

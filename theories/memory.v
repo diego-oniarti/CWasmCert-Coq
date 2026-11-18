@@ -2,7 +2,7 @@
 (* (C) J. Pichon - see LICENSE.txt *)
 
 Require Import BinNat.
-Require Import bytes.
+Require Import Wasm.bytes.
 From mathcomp Require Import ssreflect ssrbool ssrfun eqtype.
 
 Module Memory.

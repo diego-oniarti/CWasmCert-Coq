@@ -1,8 +1,8 @@
 (** Datatypes used in the binary parser. **)
 (* (C) J. Pichon - see LICENSE.txt *)
 
-Require Import common.
-Require Export numerics datatypes.
+Require Import Wasm.common.
+Require Export Wasm.numerics Wasm.datatypes.
 From mathcomp Require Import ssreflect ssrfun ssrnat ssrbool eqtype seq.
 Require Import Ascii.
 

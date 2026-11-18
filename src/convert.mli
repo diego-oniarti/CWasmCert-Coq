@@ -20,9 +20,6 @@ val to_ascii : char -> Extract.ascii
 (** Convert [Extract.ascii] to [char]. *)
 val from_ascii : Extract.ascii -> char
 
-(** Convert [Extract.string] to [string]. *)
-val from_string : Extract.string -> string
-
 (** Convert [string] to [Extract.byte Extract.list]. *)
 val to_byte_list : string -> Extract.byte Extract.list
 
@@ -50,7 +47,3 @@ val from_positive : Extract.positive -> int
 
 (** Convert [Extract.z] to [int]. *)
 val from_z : Extract.z -> int
-
-(** Print a Wasm value. *) (* TODO: Removed, now subsumed by [Execute.Interpreter.pp_values]. *)
-val string_of_value : Extract.value0 -> string
-

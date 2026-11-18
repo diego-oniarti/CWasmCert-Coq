@@ -6,7 +6,7 @@ From Wasm Require Import datatypes datatypes_properties typing.
 From compcert Require Import Integers.
 From parseque Require Import Parseque.
 Require Import Strings.Byte.
-Require Import leb128.
+Require Import Wasm.leb128.
 Require Import BinNat.
 Require Import PeanoNat.
 

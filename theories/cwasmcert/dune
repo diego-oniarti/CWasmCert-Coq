@@ -1,0 +1,8 @@
+(coq.theory
+  (name CWasm)
+  (package coq-cwasm)
+  (flags -w -notation-overridden -w -abstract-large-number -w -extraction-reserved-identifier))
+
+(env
+   (dev
+       (flags (:standard -w -A))))

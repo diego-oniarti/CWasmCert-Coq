@@ -2,7 +2,7 @@
 (* (C) J. Pichon, M. Bodin - see LICENSE.txt *)
 
 From mathcomp Require Import ssreflect ssrbool ssrnat eqtype seq.
-Require Import common.
+Require Import Wasm.common.
 From compcert Require Import Integers.
 Require Import Coq.Arith.Le.
 From parseque Require Import Char.

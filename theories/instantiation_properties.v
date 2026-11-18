@@ -2,8 +2,8 @@
 
 From mathcomp Require Import ssreflect eqtype seq ssrbool ssrfun.
 Require Import Coq.Program.Equality List NArith.
-Require Export instantiation_spec.
-Require Export type_preservation type_progress properties.
+Require Export Wasm.instantiation_spec.
+Require Export Wasm.type_preservation Wasm.type_progress Wasm.properties.
 
 (* Some of the proofs were adapted from the Iris branch -- therefore the stdpp notations for now *)
 Notation "l !! n" := (List.nth_error l n) (at level 10).

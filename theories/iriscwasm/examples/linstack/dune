@@ -1,0 +1,5 @@
+(coq.theory
+  (name CWasm.iriscwasm.examples.linstack)
+  (package coq-cwasm)
+  (flags -w -notation-overridden -w -abstract-large-number -w -extraction-reserved-identifier -w -ambiguous-paths)
+    (theories CWasm CWasm.iriscwasm.logrel CWasm.iriscwasm.examples.plainWasm CWasm.iriscwasm.rules CWasm.iriscwasm.host))

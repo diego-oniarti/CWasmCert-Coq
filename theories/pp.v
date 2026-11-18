@@ -4,9 +4,9 @@ Require Import Coq.Strings.String.
 From compcert Require Import Floats.
 From mathcomp Require Import ssreflect ssrfun ssrnat ssrbool eqtype seq.
 Require Import Coq.Init.Decimal.
-Require Import bytes_pp datatypes interpreter_func.
+Require Import Wasm.bytes_pp Wasm.datatypes Wasm.interpreter_func.
 Require Import BinNat.
-Require Import ansi list_extra.
+Require Import Wasm.ansi Wasm.list_extra.
 
 Open Scope string_scope.
 

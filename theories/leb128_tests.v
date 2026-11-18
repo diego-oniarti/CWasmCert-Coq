@@ -1,8 +1,8 @@
-Require Import leb128.
+Require Import Wasm.leb128.
 Require Import Coq.Init.Byte Coq.Numbers.BinNums.
 Require Import NArith.BinNat ZArith.ZArith.
 From parseque Require Import Running Induction.
-Require Import check_toks.
+Require Import Wasm.check_toks.
 
 (** Example from Wikipedia article: https://en.wikipedia.org/wiki/LEB128#Unsigned_LEB128
    This is the representation of the number [624485]. **)

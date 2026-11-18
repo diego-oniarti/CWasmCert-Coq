@@ -1,9 +1,9 @@
 (** Wasm AST to binary.
 Breaks non-determinism ties; see binary_format_spec.v for the spec. *)
-Require Import datatypes_properties numerics.
+Require Import Wasm.datatypes_properties Wasm.numerics.
 From compcert Require Integers.
 Require Import Strings.Byte.
-Require leb128.
+Require Wasm.leb128.
 Require Import Coq.Arith.Le.
 From mathcomp Require Import ssreflect ssrfun ssrnat ssrbool eqtype seq.
 

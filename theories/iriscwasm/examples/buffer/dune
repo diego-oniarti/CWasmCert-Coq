@@ -1,0 +1,7 @@
+(coq.theory
+  (name CWasm.iriscwasm.examples.buffer)
+  (package coq-cwasm)
+  (modules buffer_code buffer_fractional buffer_spec buffer_instantiation buffer_adequacy)
+  (flags -w -notation-overridden -w -abstract-large-number -w -extraction-reserved-identifier -w -ambiguous-paths)
+  (theories CWasm CWasm.iriscwasm.host CWasm.iriscwasm.logrel
+    CWasm.iriscwasm.rules CWasm.iriscwasm.instantiation))

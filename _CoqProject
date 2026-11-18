@@ -1,7 +1,21 @@
-
 -arg -w -arg -notation-overridden
 -arg -w -arg -abstract-large-number
 -arg -w -arg -extraction-reserved-identifier
 
--R _build/default/theories Wasm
-
+-R _build/default/theories/cwasmcert CWasm
+-R _build/default/theories/iriscwasm/examples/buffer CWasm.iriscwasm.examples.buffer
+-R _build/default/theories/iriscwasm/examples/colstack CWasm.iriscwasm.examples.colstack
+-R _build/default/theories/iriscwasm/examples/colstack/function CWasm.iriscwasm.examples.colstack.function
+-R _build/default/theories/iriscwasm/examples/linstack CWasm.iriscwasm.examples.linstack
+-R _build/default/theories/iriscwasm/examples/linstack/function CWasm.iriscwasm.examples.linstack.function
+-R _build/default/theories/iriscwasm/examples/plainWasm CWasm.iriscwasm.examples.plainWasm
+-R _build/default/theories/iriscwasm/helpers CWasm.iriscwasm.helpers
+-R _build/default/theories/iriscwasm/helpers/lfill_prelude CWasm.iriscwasm.helpers.lfill_prelude
+-R _build/default/theories/iriscwasm/helpers/prelude CWasm.iriscwasm.helpers.prelude
+-R _build/default/theories/iriscwasm/helpers/reduce_det CWasm.iriscwasm.helpers.reduce_det
+-R _build/default/theories/iriscwasm/host CWasm.iriscwasm.host
+-R _build/default/theories/iriscwasm/instantiation CWasm.iriscwasm.instantiation
+-R _build/default/theories/iriscwasm/language CWasm.iriscwasm.language
+-R _build/default/theories/iriscwasm/language/iris CWasm.iriscwasm.language.iris
+-R _build/default/theories/iriscwasm/logrel CWasm.iriscwasm.logrel
+-R _build/default/theories/iriscwasm/rules CWasm.iriscwasm.rules

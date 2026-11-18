@@ -1,13 +1,13 @@
 (** Wasm type checker **)
 (* (C) J. Pichon, M. Bodin - see LICENSE.txt *)
-Require Import common.
+Require Import Wasm.common.
 From mathcomp Require Import ssreflect ssrfun ssrnat ssrbool eqtype seq.
 
 Set Implicit Arguments.
 Unset Strict Implicit.
 Unset Printing Implicit Defensive.
 
-Require Import operations typing datatypes_properties.
+Require Import Wasm.operations Wasm.typing Wasm.datatypes_properties.
 
 
 Section Host.

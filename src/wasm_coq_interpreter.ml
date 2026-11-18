@@ -4,8 +4,7 @@
 
 (** Main function *)
 let process_args_and_run verbosity text no_exec interactive no_ctx_optimise error_code_on_crash (srcs: string list) func_name =
-  let open Execute.Host in
-  let open Execute.Interpreter in
+  let open Output.Out in
   try
     (** Preparing the files. *)
     let files =
@@ -19,29 +18,28 @@ let process_args_and_run verbosity text no_exec interactive no_ctx_optimise erro
           s) srcs in
     (** Parsing. *)
     let* m =
-      from_out (
-        let open Output in
-        ovpending verbosity stage "parsing" (fun _ ->
-          if text then
-            Error "Text mode not yet implemented."
-          else
-            match Execute.Interpreter.run_parse_module (String.concat "" files) with
-            | None -> Error "syntax error"
-            | Some m -> OK m)) in
+      let open Output in
+      ovpending verbosity stage "parsing" (fun _ ->
+        if text then
+          Error "Text mode not yet implemented."
+        else
+          match Shim.run_parse_module (String.concat "" files) with
+          | None -> Error "syntax error"
+          | Some m -> OK m) in
     (** Running. *)
     if no_exec then
       Output.(
         debug_info verbosity stage (fun _ ->
           "skipping interpretation because of --no-exec.\n") ;
-        Execute.Interpreter.pure ()
+          pure ()
       )
     else Execute.instantiate_interpret verbosity interactive no_ctx_optimise error_code_on_crash m func_name
-  with Invalid_argument msg -> error msg
+  with Invalid_argument msg -> Output.Error msg
 
 (** Similar to [process_args_and_run], but differs in the output type. *)
 let process_args_and_run_out verbosity text no_exec interactive no_ctx_optimise error_code_on_crash srcs func_name =
   process_args_and_run verbosity text no_exec interactive no_ctx_optimise error_code_on_crash srcs func_name
-  |> Execute.Host.to_out |> Output.Out.convert
+  |> Output.Out.convert
 
 (** Command line interface *)
 
@@ -72,7 +70,7 @@ let interactive =
   Arg.(value & flag & info ["i"; "interactive"] ~doc)
 
 let no_ctx_optimise = 
-  let doc = "Disable context optimisation." in
+  let doc = "Compatibility flag; the CWasm executable uses the functional interpreter." in
   Arg.(value & flag & info ["nc"; "nocontext"] ~doc)
 
   (*
@@ -114,4 +112,3 @@ let () = Stdlib.exit @@
    | Ok _ -> Cmd.Exit.ok
    | Error _ -> Cmd.Exit.some_error
    
-
